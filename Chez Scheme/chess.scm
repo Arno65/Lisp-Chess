@@ -46,6 +46,9 @@
 ;;
 ;; The code is very inefficient. So refactor...
 ;;
+;; run in terminal
+;; $ chez chess.scm
+;;
 ;;  (cl) 2025-12-31, 2026-01-27 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 
