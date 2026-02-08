@@ -1,3 +1,6 @@
 # Lisp-Chess
 
-A test
+Lisp / Scheme chess engine code
+
+A first draft with an incomplete engine.
+ 
