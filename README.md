@@ -1,6 +1,5 @@
 # Lisp / Scheme - Chess
 
-Lisp / Scheme chess engine code
 
 This is my second version with a better and faster 'legal move generator'.\
 I'm not a good chess player. 
