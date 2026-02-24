@@ -22,11 +22,12 @@
 ;;  version 2.41a   2026-02-22    Added a first open-library functions
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
+;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-23 by Arno Jacobs
+;;  (cl) 2026-02-24 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -36,6 +37,9 @@
 (load "chess-legal-moves.scm")
 (load "chess-evaluate.scm")
 
+(define *BW-indicator* white)
+(define reset-string "\x1b;[0m")
+
 ;; No range checking
 (define (pretty-position position)
   (let ((position-letter (string (integer->char (+ 97 (first  position)))))
@@ -43,9 +47,9 @@
     (string-append position-letter position-number)))
 
 (define (pretty-positions positions)
-   (apply
-    string-append
-    (map (lambda (p) (string-append (pretty-position p) " ")) positions )))
+  (apply
+   string-append
+   (map (lambda (p) (string-append (pretty-position p) " ")) positions )))
 
   
 (define (pretty-move move)
@@ -57,9 +61,11 @@
 (define (pretty-colour piece-value)
   (if (= empty piece-value)
       "  "
-      (if (= (colour piece-value) white)
-          " w"
-          " b")))
+      (if (= (colour piece-value) black)
+          (if (= *BW-indicator* white)
+              "\x1b;[1m\x1b;[102m\x1b;[30m "
+              "\x1b;[1m\x1b;[42m\x1b;[30m ")
+          " ")))
 
 (define (pretty-colour-plus piece-value)
   (cond ((= (sgn piece-value) white) "white")
@@ -71,14 +77,13 @@
 ;; very readable
 (define (pretty-type piece-value)
   (let ((piece-type (abs piece-value)))
-        (cond ((= piece-type King)   "K")
-              ((= piece-type Queen)  "Q")
-              ((= piece-type Bishop) "B")
-              ((= piece-type Knight) "N")
-              ((= piece-type Rook)   "R")
-              ((= piece-type Pawn)   "p")
-              (InRacket              "_")
-              (else                  " "))))
+    (cond ((= piece-type King)   "K ")
+          ((= piece-type Queen)  "Q ")
+          ((= piece-type Bishop) "B ")
+          ((= piece-type Knight) "N ")
+          ((= piece-type Rook)   "R ")
+          ((= piece-type Pawn)   "p ")
+          (else                  " "))))
 
 (define (pretty-type-plus piece-type)
   (cond ((= piece-type King)   "King  ")
@@ -90,22 +95,35 @@
         (else                  " _    ")))
 
 (define (pretty-piece piece-value)
+  (set! *BW-indicator* (- *BW-indicator*))
   (let ((piece-colour (pretty-colour piece-value))
-        (piece-type   (pretty-type   piece-value)))
-        (string-append piece-colour piece-type)))
+        (piece-type   (pretty-type   piece-value))
+        (BW-string    (if (= *BW-indicator* white)
+                          "\x1b;[100m\x1b;[97m"    ;; grey background
+                          "\x1b;[40m\x1b;[97m")))  ;; black background
+    (string-append BW-string piece-colour piece-type reset-string )))
 
 (define (pretty-line-of-pieces piece-values)
+  (set! *BW-indicator* (- *BW-indicator*))
   (if (null? piece-values)
       "\n\n"
       (string-append (pretty-piece (first piece-values))
                      "  "
                      (pretty-line-of-pieces (rest piece-values)))))
 
+(define (pretty-En-Passant-target)
+  (set! *BW-indicator* (- *BW-indicator*))
+  (let ((BW-string (if (= *BW-indicator* white)
+                       "\x1b;[100m\x1b;[97m"    ;; grey background
+                       "\x1b;[40m\x1b;[97m")))  ;; black background
+    (string-append BW-string " % " reset-string)))
+
 (define (pretty-line-with-en-passant-target piece-values x ept-x)
+  (set! *BW-indicator* (- *BW-indicator*))
   (if (null? piece-values)
       "\n\n"
       (string-append (if (= x ept-x)
-                         "  %" 
+                         (pretty-En-Passant-target)
                          (pretty-piece (first piece-values)))
                      "  "
                      (pretty-line-with-en-passant-target (rest piece-values) (+ x 1) ept-x ))))
@@ -118,6 +136,7 @@
         (pretty-line-of-pieces piece-values))))
 
 (define (pretty-board-lines board line en-passant-target)
+  (set! *BW-indicator* white)
   (if (null? board)
       ""
       (string-append " "
@@ -134,21 +153,21 @@
         (hasLongWhite  (member (* white Long-Castling)  castling-info))
         (hasShortBlack (member (* black Short-Castling) castling-info))
         (hasLongBlack  (member (* black Long-Castling)  castling-info)))
-  (display "\n Castling availability")
-  (if (and hasShortWhite hasLongWhite)
-      (display "\n  white:   O-O   O-O-O")
-      (if hasShortWhite
-          (display "\n  white:   O-O")
-          (if hasLongWhite
-              (display "\n  white:         O-O-O")
-              (display ""))))
-  (if (and hasShortBlack hasLongBlack)
-      (display "\n  black:   O-O   O-O-O")
-      (if hasShortBlack
-          (display "\n  black:   O-O")
-          (if hasLongBlack
-              (display "\n  black:         O-O-O")
-              (display ""))))))
+    (display "\n Castling availability")
+    (if (and hasShortWhite hasLongWhite)
+        (display "\n  white:   O-O   O-O-O")
+        (if hasShortWhite
+            (display "\n  white:   O-O")
+            (if hasLongWhite
+                (display "\n  white:         O-O-O")
+                (display ""))))
+    (if (and hasShortBlack hasLongBlack)
+        (display "\n  black:   O-O   O-O-O")
+        (if hasShortBlack
+            (display "\n  black:   O-O")
+            (if hasLongBlack
+                (display "\n  black:         O-O-O")
+                (display ""))))))
 
 (define (pretty-en-passant-target en-passant-target)
   (display "\n En Passant target: ")
@@ -168,7 +187,7 @@
 (define (piece-counter-per-row board row piece)
   (do ((x (- width 1) (- x 1))
        (ppc 0 (+ (if (= (location-value board x row) piece) 1 0) ppc )))
-          ((< x 0) ppc )))
+    ((< x 0) ppc )))
      
 (define (promotion-possibility? board players-colour)
   (if (= players-colour white)
@@ -182,8 +201,8 @@
         (en-passant-target (fourth play-state))
         (half-moves (nth play-state 4))  ;; fifth has index '4'
         (full-moves (nth play-state 5))
-;; (white-Kings-position (nt play-state 6))
-;; (black-Kings-position (nt play-state 7))
+        ;; (white-Kings-position (nt play-state 6))
+        ;; (black-Kings-position (nt play-state 7))
         (promotion-piece (nth play-state 8))
         (is-full-game? (nth play-state 9)))
     (display "\n\n\n")    
@@ -232,17 +251,17 @@
              (from-move (first move))
              (to-move (second move))
              (piece-type (abs (location-value board (first from-move) (second from-move)))))
-         (if (equal? current-from from-move)
-             (string-append
-              " "
-              (pretty-position to-move)             
-              (pretty-moves-lines board next-moves from-move))
-             (string-append
-              "\n"
-              (pretty-type-plus piece-type)
-              "  "
-              (pretty-move move)
-              (pretty-moves-lines board next-moves from-move))))))
+        (if (equal? current-from from-move)
+            (string-append
+             " "
+             (pretty-position to-move)             
+             (pretty-moves-lines board next-moves from-move))
+            (string-append
+             "\n"
+             (pretty-type-plus piece-type)
+             "  "
+             (pretty-move move)
+             (pretty-moves-lines board next-moves from-move))))))
 
 (define (sort-pieces moves)
   (if (null? moves)
@@ -304,7 +323,7 @@
           (string-append "\n * The search depth is set to "
                          (number->string next-search-depth)
                          " ply.\n" )))
-  (display next-search-depth-string)
+    (display next-search-depth-string)
     next-search-depth))
 
 (define (pretty-evaluation-score play-state)
@@ -340,19 +359,19 @@
 
 (define (pretty-FEN-type piece-value)
   (let ((piece-type (abs piece-value)))
-        (cond ((= piece-value (* white King))   "K")
-              ((= piece-value (* white Queen))  "Q")
-              ((= piece-value (* white Bishop)) "B")
-              ((= piece-value (* white Knight)) "N")
-              ((= piece-value (* white Rook))   "R")
-              ((= piece-value (* white Pawn))   "P")
-              ((= piece-value (* black King))   "k")
-              ((= piece-value (* black Queen))  "q")
-              ((= piece-value (* black Bishop)) "b")
-              ((= piece-value (* black Knight)) "n")
-              ((= piece-value (* black Rook))   "r")
-              ((= piece-value (* black Pawn))   "p")
-              (else                             "?"))))
+    (cond ((= piece-value (* white King))   "K")
+          ((= piece-value (* white Queen))  "Q")
+          ((= piece-value (* white Bishop)) "B")
+          ((= piece-value (* white Knight)) "N")
+          ((= piece-value (* white Rook))   "R")
+          ((= piece-value (* white Pawn))   "P")
+          ((= piece-value (* black King))   "k")
+          ((= piece-value (* black Queen))  "q")
+          ((= piece-value (* black Bishop)) "b")
+          ((= piece-value (* black Knight)) "n")
+          ((= piece-value (* black Rook))   "r")
+          ((= piece-value (* black Pawn))   "p")
+          (else                             "?"))))
 
 (define (count-empties row empties)
   (if (null? row)
@@ -404,12 +423,12 @@
          (full-moves (number->string (nth play-state 5)))
          (is-full-game? (nth play-state 9))
          (moves-counter-FEN-string (if is-full-game? (string-append half-moves " " full-moves) "")))
-         ;;
+    ;;
     (display (string-append "\n # FEN: " board-FEN-string
-                                " " player-colour-FEN-string
-                                " " castling-FEN-string
-                                " " En-Passant-target-FEN-string
-                                " " moves-counter-FEN-string "\n" )))
+                            " " player-colour-FEN-string
+                            " " castling-FEN-string
+                            " " En-Passant-target-FEN-string
+                            " " moves-counter-FEN-string "\n" )))
   null)
         
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---

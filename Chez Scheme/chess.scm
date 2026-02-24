@@ -22,11 +22,12 @@
 ;;  version 2.41a   2026-02-22    Added a first open-library functions
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
+;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-23 by Arno Jacobs
+;;  (cl) 2026-02-24 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -53,9 +54,9 @@
 (define introduction
   (string-append
    "\n\n * * *   a tiny and simple Lisp/Scheme chess engine   * * *\n\n"
-   "  version 2.41s  ("
+   "  version 2.42s  ("
    (number->string search-depth)
-   " ply)   (cl) 2026-02-23  by Arno Jacobs\n\n"))
+   " ply)   (cl) 2026-02-24  by Arno Jacobs\n\n"))
 
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;; ps  is play state
@@ -67,26 +68,11 @@
 ;;(define ps Mate-in-4-white-01)
 
 
-
-
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;; Read commands or moves from the keyboard
 ;;
 ;; First the simple parse only for format 'e2e4'
 ;; (for now 'e2e4' is the working format)
-;;
-;; Commands:
-;;  b     show the current board
-;;  c     play a Lisp-code-generated move
-;;  e     show the evaluation score of the current board position
-;;  f     show the FEN string of the current board position
-;;  g     show all the previous moves
-;;  h     show this helper information
-;;  m     show all possible moves for the current player
-;;  M     show all possible moves for the opponent
-;;  p     set promotion piece (Queen, Bishop, Knight, Rook)
-;;  s     show the current promotion piece
-;;  q     quit the game
 ;;
 
 (define (pretty-helper-information)
@@ -199,23 +185,11 @@
 ;; FEN: initial board
 ;; FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0 
 
-
 ;; FEN: mate in 4
 ;; FEN: 8/8/8/1p3P2/8/kPpN4/1pB5/1K3R2 w - -
 
 ;; FEN: mate in 3
 ;; FEN: 8/k1P5/8/1KR5/8/8/8/8 w - -
-
-
-
-
-
-;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
-;; Fastest run:
-;; $ /Applications/Racket\ v9.0/bin/racket chess.scm
-;;
-;; This version is slow but faster than the SBCL version.
-;; The Scheme version in Chez Scheme is a bit faster
 
 ;;
 ;; End of code.
