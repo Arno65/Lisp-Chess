@@ -221,6 +221,9 @@
     (if (not (equal? en-passant-target No-Position))
         (pretty-en-passant-target en-passant-target)
         (display ""))
+    (display (string-append "\n Current computer search depth: "
+                            (number->string search-depth)
+                            " ply"))
     (display "\n Current player colour is ")
     (display (pretty-colour-plus players-colour))
     (display "\n")))
