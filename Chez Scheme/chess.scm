@@ -53,10 +53,9 @@
 
 (define introduction
   (string-append
-   "\n\n * * *   a tiny and simple Lisp/Scheme chess engine   * * *\n\n"
-   "  version 2.42s  ("
-   (number->string search-depth)
-   " ply)   (cl) 2026-02-24  by Arno Jacobs\n\n"))
+   "\n\n ( ( ( a tiny and simple  ( Chez Scheme ( Lisp ))  chess engine ) ) )\n\n"
+   "   ( (cl)  2026-02-24  by Arno Jacobs )\n\n"
+   "   ( version 2.42s )\n"))
 
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;; ps  is play state
@@ -171,6 +170,7 @@
 
 (define (game-loop)
   (display introduction)
+  (random-seed (time-second (current-time)))
   (pretty-board ps)  
   (play-game ps
              (if (equal? (second ps) white)
