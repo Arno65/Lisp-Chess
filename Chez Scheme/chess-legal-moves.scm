@@ -23,11 +23,12 @@
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
 ;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
+;;  version 2.43s   2026-02-25    Fix in FEN parser
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-24 by Arno Jacobs
+;;  (cl) 2026-02-25 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -585,7 +586,6 @@
              (attack-from-move? board Kings-position move attacking-Knight))
            all-Knight-moves)))
   
-
 ;; Testing the horizontal and vertical lines
 (define (Rooks-and-Queen-attacks-on? board Kings-position opponents-colour)
   (let* ((all-Rook-moves '( (-1  0) ( 1  0)
@@ -614,7 +614,6 @@
               attacking-Bishop attacking-Queen))
            all-Bishop-moves)))
 
-              
 (define (King-blocks-King? board Kings-position opponents-colour)
   (let ((all-King-moves '((-1 -1) (0 -1) (1 -1)
                           (-1  0)        (1  0)

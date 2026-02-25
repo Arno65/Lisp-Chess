@@ -23,11 +23,12 @@
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
 ;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
+;;  version 2.43s   2026-02-25    Fix in FEN parser
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-24 by Arno Jacobs
+;;  (cl) 2026-02-25 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -112,7 +113,6 @@
 (define Read-FEN-string       (list '(29 29) '(29 29))) ;; format as a move
 (define Quit-game             (list '(99 99) '(99 99))) ;; format as a move
 
-
 ;; Piece state helpers
 (define En-Passant-target  No-Position)
 (define Short-Castling     20)
@@ -120,7 +120,6 @@
 
 ;; Helper for a promotion piece
 (define promotion-pieces (list Queen Bishop Knight Rook))
-
 
 ;; Some list helper code
 (define (first lst)  (car    lst))
@@ -141,7 +140,6 @@
 ;; Pick a random element from a list
 (define (random-element ls)
   (nth ls (random (length ls))))
-
 
 (define (safe-second lst)
   (if (> (length lst) 1)

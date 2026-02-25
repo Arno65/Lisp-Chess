@@ -23,11 +23,12 @@
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
 ;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
+;;  version 2.43s   2026-02-25    Fix in FEN parser
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-24 by Arno Jacobs
+;;  (cl) 2026-02-25 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -54,8 +55,8 @@
 (define introduction
   (string-append
    "\n\n ( ( ( a tiny and simple  ( Chez Scheme ( Lisp ))  chess engine ) ) )\n\n"
-   "   ( (cl)  2026-02-24  by Arno Jacobs )\n\n"
-   "   ( version 2.42s )\n"))
+   "   ( (cl)  2026-02-25  by Arno Jacobs )\n\n"
+   "   ( version 2.43s )\n"))
 
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;; ps  is play state
@@ -190,6 +191,11 @@
 
 ;; FEN: mate in 3
 ;; FEN: 8/k1P5/8/1KR5/8/8/8/8 w - -
+
+;; --- Reminder --- the promotion piece has to be set manually - default is Queen
+;; Mate in 2 with Pawn to Knight promotion
+;; FEN: 2r2r2/6kp/3p4/3P4/4Pp2/5P1P/PP1pq1P1/4R2K b - -
+
 
 ;;
 ;; End of code.

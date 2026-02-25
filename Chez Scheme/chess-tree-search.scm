@@ -23,11 +23,12 @@
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
 ;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
+;;  version 2.43s   2026-02-25    Fix in FEN parser
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-24 by Arno Jacobs
+;;  (cl) 2026-02-25 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -76,17 +77,19 @@
                                                       (- depth 1))
                                          ) next-opponents-moves )))))))))))
 
-
 (define (find-and-show-score-for-best-from-move play-state moves search-depth show-scores)
   (if (null? moves)
       No-Moves
       (let* ((move (first moves))
              (score (search-tree play-state move search-depth))
-             (move-score (list score move)))
+             (move-score (list score move))
+             (mate-in-2-score (* (- search-depth 2) Checkmate-value)))
         (if show-scores
             (display (pretty-score play-state move-score))
             (display ""))
-        (cons move-score (find-and-show-score-for-best-from-move play-state (rest moves) search-depth show-scores)))))
+        (if (= score mate-in-2-score) 
+            (list move-score)
+            (cons move-score (find-and-show-score-for-best-from-move play-state (rest moves) search-depth show-scores))))))
 
 (define (find-and-show-score-for-best-from-moves play-state moves search-depth show-scores)
   (if show-scores
@@ -117,7 +120,6 @@
             (first first-moves)
             (find-best-from-moves play-state first-moves search-depth show-scores))
         check-mate-move)))  ;; mate in one
-
 
 ;; Look up board position in opening library
 (define (get-opening-move game library-game)
@@ -157,8 +159,6 @@
           (pretty-move-plus piece-type move)
           move)
         (computer-opening-library-move play-state open-moves))))
-
-    
 
 ;; NO mate in one branch
 (define (analyse-best-move play-state search-depth show-scores)  

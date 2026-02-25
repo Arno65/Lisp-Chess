@@ -23,11 +23,12 @@
 ;;  version 2.41b   2026-02-22    Working open-library and FEN functions
 ;;  version 2.41s   2026-02-23    Conversion to Chez Scheme code
 ;;  version 2.42s   2026-02-24    Added colour displaying the board for a standard Mac OS shell
+;;  version 2.43s   2026-02-25    Fix in FEN parser
 ;;
 ;; run in terminal
 ;; $ chez chess.scm
 ;;
-;;  (cl) 2026-02-24 by Arno Jacobs
+;;  (cl) 2026-02-25 by Arno Jacobs
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
 ;; A small speed increase (~7% ?)
@@ -274,6 +275,11 @@
    (list 0 0)      ;; position black King
    Queen
    #f ))           ;; set for a puzzel - not a full game
+
+
+;; Mate in 2 with Pawn to Knight promotion
+;; FEN: 2r2r2/6kp/3p4/3P4/4Pp2/5P1P/PP1pq1P1/4R2K b - -
+
 
 ;; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ---
 ;;
